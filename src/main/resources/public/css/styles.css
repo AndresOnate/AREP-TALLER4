@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+h1 {
+    color: #333;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input {
+    padding: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    max-width: 800px; /* Ancho máximo del contenedor de imagen */
+    max-height: 600px; /* Alto máximo del contenedor de imagen */
+    overflow: hidden; /* Oculta el exceso de imagen si se excede el tamaño */
+}
+
+.image-container img {
+    width: 100%; /* Ajusta la imagen al ancho máximo del contenedor */
+    height: auto; /* Para mantener la proporción de aspecto */
+}
+
+.footer-image {
+    max-width: 300px; /* ajusta el tamaño máximo de la imagen */
+    height: auto; /* para mantener la proporción de aspecto */
+}
+

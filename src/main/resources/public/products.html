@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de productos</title>
+    <link rel="stylesheet" href="css/productsStyles.css">
+</head>
+<body>
+<div class="container">
+    <h2>Formulario de productos</h2>
+    <form action="/products" method="post">
+        <label for="name">Nombre del producto:</label>
+        <input type="text" id="name" name="name">
+        <label for="description">Descripción:</label>
+        <textarea id="description" name="description"></textarea>
+        <label for="price">Precio:</label>
+        <input type="number" id="price" name="price" step="0.01">
+        <button type="submit">Enviar</button>
+    </form>
+</div>
+</body>
+</html>

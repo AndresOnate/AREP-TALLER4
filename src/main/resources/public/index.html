@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies Information</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="shortcut icon" href="img/play.png" type="image/png">
+</head>
+<body>
+<h1>Get Movie Information</h1>
+<div class="image-container">
+    <img src="img/collage.jpg" alt="Movie Collage">
+</div>
+<form action="/movies">
+    <label for="title">Title:</label><br>
+    <input type="text" id="title" name="title"><br><br>
+    <input type="button" value="Search" onclick="loadGetMsg()">
+</form>
+<div id="getrespmsg"></div>
+<img src="img/pop.png" alt="Footer"  class="footer-image">
+<script src="js/APIScript.js"></script>
+</body>
+</html>
+
