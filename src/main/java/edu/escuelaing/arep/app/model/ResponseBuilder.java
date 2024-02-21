@@ -73,6 +73,18 @@ public class ResponseBuilder {
         return output;
     }
 
+
+    public static String httpOkServiceCall(String verb, String contentType){
+        String returnCode = "200 OK";
+        if(verb.equals("POST")){
+            returnCode = "201 Created";
+        }
+        String output = "HTTP/1.1 " +  returnCode + "\r\n"
+                + "Content-Type:" + contentType + "\r\n"
+                + "\r\n";
+        return output;
+    }
+
     public static String httpOkHeader(String contentType){
         return   "HTTP/1.1 200 OK\r\n"
                 + "Content-Type:" + contentType

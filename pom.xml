@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>edu.escuelaing.arep.app</groupId>
-  <artifactId>LAB3_AREP</artifactId>
+  <artifactId>LAB4_AREP</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>LAB3_AREP</name>
+  <name>LAB4_AREP</name>
   <url>http://maven.apache.org</url>
 
   <properties>

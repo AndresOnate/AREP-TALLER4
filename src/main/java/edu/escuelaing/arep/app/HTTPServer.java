@@ -1,6 +1,10 @@
 package edu.escuelaing.arep.app;
 
 
+import edu.escuelaing.arep.app.annotations.Component;
+import edu.escuelaing.arep.app.annotations.GetMapping;
+import edu.escuelaing.arep.app.annotations.PostMapping;
+import edu.escuelaing.arep.app.annotations.RequestBody;
 import edu.escuelaing.arep.app.controller.APIController;
 import edu.escuelaing.arep.app.controller.MovieAPI;
 import edu.escuelaing.arep.app.model.Request;
@@ -8,12 +12,16 @@ import edu.escuelaing.arep.app.model.ResponseBuilder;
 import edu.escuelaing.arep.app.service.Function;
 
 import java.io.*;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,21 +30,23 @@ import java.util.Map;
  *
  * It supports requests related to movie information and provides a default HTML response.
  */
-public class MySpark
+public class HTTPServer
 {
     /**
      * Represents the API controller for fetching movie information.
      */
     private static MovieAPI myMoviesAPI = new APIController();
-    private static MySpark _instance = new MySpark();
+    private static HTTPServer _instance = new HTTPServer();
     private static String location = "public";
 
-    private static HashMap<String, Function> getServices = new HashMap<String, Function>();
-    private static HashMap<String, Function> postServices = new HashMap<String, Function>();
+        private static HashMap<String, Method> getServices = new HashMap<String, Method>();
+    private static HashMap<String, Method> postServices = new HashMap<String, Method>();
 
-    private MySpark(){}
+    private static String classesPath = "target/classes/edu/escuelaing/arep/app/controller/";
 
-    public static MySpark getInstance(){
+    private HTTPServer(){}
+
+    public static HTTPServer getInstance(){
         return _instance;
     }
 
@@ -48,8 +58,16 @@ public class MySpark
      * @param args The command line arguments passed to the program.
      * @throws Exception If an error occurs during the execution of the server.
      */
-    public void runServer( String[] args ) throws Exception
+    public static void main(String[] args)  throws Exception
     {
+        List<Class<?>> classes = getClasses(classesPath);
+        for (Class<?> classInPath : classes) {
+            if (classInPath.isAnnotationPresent(Component.class)) {
+                loadComponent(classInPath);
+            }
+        }
+        System.out.println(getServices.keySet());
+
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(35000);
@@ -79,7 +97,7 @@ public class MySpark
      * @throws IOException If an I/O error occurs while reading from or writing to the client socket.
      * @throws URISyntaxException If an error occurs while parsing the URI of the request.
      */
-    private void handleClientRequest(Socket clientSocket) throws IOException, URISyntaxException {
+    private static void handleClientRequest(Socket clientSocket) throws IOException, URISyntaxException {
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(
@@ -136,11 +154,20 @@ public class MySpark
                 }
             }else if(httpMethod.equals("GET")){
                 if(getServices.containsKey(path)){
-                    outputLine = callService(getServices.get(path), request);
+                    Method webService = getServices.get(path);
+                    String contentType= webService.getAnnotation(GetMapping.class).produces();
+                    outputLine = ResponseBuilder.httpOkServiceCall("GET", contentType);
+                    outputLine = outputLine + webService.invoke(null);
                 }
             } else if(httpMethod.equals("POST")) {
                 if (postServices.containsKey(path)) {
-                    outputLine = callService(postServices.get(path), request);
+                    Method webService = postServices.get(path);
+                    Parameter[] parameters = webService.getParameters();
+                    String contentType= webService.getAnnotation(PostMapping.class).produces();
+                    outputLine = ResponseBuilder.httpOkServiceCall("POST", contentType);
+                    if(parameters[0].isAnnotationPresent(RequestBody.class)){
+                        outputLine = outputLine + webService.invoke(null, requestBody);
+                    }
                 }
             }
         }catch (Exception e){
@@ -204,14 +231,6 @@ public class MySpark
         out.close();
     }
 
-    public static void  get(String path, Function svc) throws Exception {
-        getServices.put(path,svc);
-    }
-
-    public static void  post(String path, Function svc) throws Exception {
-        postServices.put(path,svc);
-    }
-
     public static void setLocation(String newLocation){
         location = newLocation;
     }
@@ -242,7 +261,48 @@ public class MySpark
         return params;
     }
 
+    public static List<Class<?>> getClasses(String directory) throws IOException, ClassNotFoundException {
+        List<Class<?>> classes = new ArrayList<>();
+        File folder = new File(directory);
+        String[] files = folder.list();
+        for (String file : files) {
+            if (file.endsWith(".class")) {
+                String className = file.substring(0, file.length() - 6);
+                className = "edu.escuelaing.arep.app.controller." + className;
+                System.out.println(className);
+                Class<?> classInPath = loadClass(className, directory);
+                if (classInPath != null) {
+                    classes.add(classInPath);
+                }
+            }
+        }
+        return classes;
+    }
 
+    public static Class<?> loadClass(String className, String directory) throws ClassNotFoundException {
+        try {
+            File classFile = new File(directory);
+            URL url = classFile.toURI().toURL();
+            URL[] urls = new URL[]{url};
+            ClassLoader classLoader = new URLClassLoader(urls);
+            return classLoader.loadClass(className);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static void loadComponent(Class<?> classInPath){
+        for(Method method: classInPath.getMethods()){
+            if (method.isAnnotationPresent(GetMapping.class)) {
+                String service = method.getAnnotation(GetMapping.class).value();
+                getServices.put(service, method);
+            }
+            if (method.isAnnotationPresent(PostMapping.class)) {
+                String service = method.getAnnotation(PostMapping.class).value();
+                postServices.put(service, method);
+            }
+        }
+    }
 
 }
 
