@@ -63,7 +63,6 @@ public class HTTPServer
                 loadComponent(classInPath);
             }
         }
-        System.out.println(getServices.keySet());
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(35000);
