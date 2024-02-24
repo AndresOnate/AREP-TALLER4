@@ -61,58 +61,56 @@ Las siguientes instrucciones le permitirán descargar una copia y ejecutar la ap
 
 7. Verifique en la linea de comanos que se imprimió el mensaje **Listo para recibir ...**
    
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/1060d327-357b-4a9f-8055-60a98065be70)
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/f048c372-cb97-436a-9613-ea7ef0f6268e)
 
+9. De igual forma, puede abrir el proyecto con un IDE y ejecutar el método main de la clase `HTTPServer`. En la imagen siguiente se muestra el proyecto con el IDE IntelliJ:
 
-9. De igual forma, puede abrir el proyecto con un IDE y ejecutar el método main de la clase `MyServices`. En la imagen siguiente se muestra el proyecto con el IDE IntelliJ:
-
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/97f4d62b-d5e9-41aa-9b86-0eb87f01ce01)
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/f5d1cc4e-5035-4e49-9f26-35735e538372)
 
 
 ## Construyendo aplicaciones
 
-La clase `MySpark` permite el registro de servicios get y post usando funciones lambda. Cuando se recibe una solicitud GET o POST en la ruta especificada , el servidor ejecutará la función lambda proporcionada como segundo argumento. La función lambda toma un objeto `Request` como parámetro, que representa la solicitud entrante y un objeto `ResponseBuilder` que le permite modificar el tipo de la respuesta, por ejemplo, a "application/json".
+Las anotaciones  `GetMapping` y  `PostMapping` registran el valor con el cual el usuario puede acceder a los servicios con el atributo `value` produces, el atributo `produces` permite cambiar el tipo de retorno, por ejemplo `application/json`.
 
-Para registrar un servicio GET o POST, utilizamos los métodos get() y post() proporcionados por la clase `MySpark`. Estos métodos toman dos argumentos: la ruta del servicio y una función lambda que define el comportamiento del servicio. Dentro de la función lambda, puedes procesar la solicitud, realizar operaciones necesarias (como procesar datos, consultar APIs externas etc.) y generar la respuesta correspondiente.
+- `GetMapping`: La anotación @GetMapping se usa para mapear métodos de controlador a solicitudes HTTP GET. Se aplica sobre métodos de controlador y se especifica la ruta relativa del endpoint que manejará. Por ejemplo, al aplicar @GetMapping("/products") a un método getAllProducts(), este método manejará las solicitudes GET a la URL "/products". 
 
+- `PostMapping`: La anotación @PostMapping se utiliza para mapear métodos de controlador a solicitudes HTTP POST. Al igual que @GetMapping, se aplica sobre métodos de controlador y se especifica la ruta relativa del endpoint que manejará. Por ejemplo, al aplicar @PostMapping("/products") a un método saveProduct(String newProduct), este método manejará las solicitudes POST a la URL "/products".
+  
+- `PathVariable`: En algunos casos, es necesario capturar variables de la URL dentro de los métodos del controlador. El valor de la variable de ruta se extraería de la URL y se pasaría al método como argumento. Por ahora, solo está implementado para una variable.
 
-Ejemplo de una función lambda en un servicio GET:
+- `PathVariable`: Se utiliza para extraer los parámetros de una solicitud HTTP. Por ejemplo, una solicitud GET a "/movies?title=TheMatrix" proporcionaría "TheMatrix" como valor para el parámetro "title"
+
+Ejemplo de un servicio GET:
 
 ```
-// Registro de un servicio GET en la ruta '/hi'
-get("/hi", (req, res) -> {
-          // Obtener la ruta de la URI de la solicitud
-          String path = req.getUri().getPath();
-          // Generar una respuesta con la ruta
-          return "El query es:" + path;
-      });
+    @GetMapping(value = "/movies", produces = "application/json")
+    public static String getMovieInformation(@RequestParam String title) throws IOException {
+        APIController apiMovies = new APIController();
+        return  apiMovies.connectToMoviesAPI(title);
+    }
 ```
+En este ejemplo, se tiene un método de controlador que maneja las solicitudes HTTP GET a la ruta "/movies" y produce una respuesta en formato JSON. `@RequestParam`: Esta anotación se utiliza para extraer parámetros de la URL de la solicitud HTTP. En este caso, el parámetro title se espera que esté presente en la URL de la solicitud GET. Por ejemplo, si la URL de la solicitud GET es "/movies?title=Wish", el valor "Wish" se asignará al parámetro title.
+
+```
+    @GetMapping(value = "/products/", produces = "application/json")
+    public static String getProductsById(@PathVariable String id){
+        return productService.getProductById(id).toString();
+    }
+```
+Este método maneja las solicitudes GET dirigidas a la ruta `/products/` seguida de un identificador único de producto, como por ejemplo `/products/1`. Captura este identificador único de producto de la URL como un parámetro de ruta utilizando la anotación `@PathVariable`.
 
 Ejemplo de una función lambda en un servicio POST:
 ```
-post("/products", (req, res) -> {
-    // Configurar el tipo de respuesta como JSON
-    res.setResponseType("application/json");
-    // Crear un nuevo producto a partir de los datos en el cuerpo de la solicitud
-    Product product = new Product(req.getBody());
-    // Agregar el producto a la lista de productos
-    productService.addProduct(product);
-    // Devolver el producto como una cadena JSON
-    return product.toString();
-});
+    @PostMapping(value = "/products", produces = "application/json")
+    public static String saveProduct(@RequestBody String newProduct){
+        Product product = new Product(newProduct);
+        productService.addProduct(product);
+        return product.toString();
+    }
 
 ```
 
-Por defecto, la ruta de acceso a los recursos estáticos es `/public`, si se requiere, se puede cambiar con el método `setLocation` de la clase `MySpark`.
-Una vez que se hayan definido los servicios, puede ejecutar el servidor (método `runServer`) para comenzar a manejar solicitudes HTTP:
-
-```
-public static void main(String[] args) throws Exception {
-    // servicios post y get
-    MySpark.getInstance().runServer(args);
-}
-
-```
+Este método maneja las solicitudes POST dirigidas a la ruta "/products". Cuando se recibe una solicitud, espera que el cuerpo de la misma contenga información sobre un nuevo producto en formato JSON. Utilizando esta información, crea un nuevo objeto de tipo Product y lo añade a la base de datos mediante el servicio productService. Posteriormente, devuelve los detalles del producto recién creado en formato JSON como respuesta al cliente.
 
 Por defecto, los servicios estarán disponibles en la ruta `http://localhost:35000/`
 
@@ -120,69 +118,55 @@ Por defecto, los servicios estarán disponibles en la ruta `http://localhost:350
 
 ### Archivos Estáticos
 
-Puede asignar una carpeta  que sirve archivos estáticos con el método `MySpark.setLocation`, si por ejemplo, el directorio es configurado en `/public`, Un archivo /public/css/style.css está disponible como `http://{host}:{port}/css/style.css`.
-
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/8462a39b-ce0f-4065-80aa-344bb6c03664)
-
 Entrega archivos estáticos como páginas HTML, CSS, JS e imágenes:
 
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/cee5f6a9-9f3f-4675-a475-0046efcf4c99)
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/edafe78f-7adf-42ce-b584-58358aac5c2f)
+
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/2f927234-091e-414f-987f-3ff82e148bcc)
+
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/4d4f4459-de63-43ed-8b11-5244df7c821d)
 
 Si no se encuentra el archivo en el directorio especificado, se mostrará un mensaje de error:
 
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/cd653c10-ded2-4c5d-8d8c-6c2b7b2af4a0)
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/eeca9a36-4104-48f8-8c9b-c80bbee05458)
 
 
 ### GET
 
-La clase `mySpark` ofrece el servicio get, se desarrollaron los siguientes ejemplos:
 
-`/hi`retorna un mensaje que incluye la ruta del URI recibido en la solicitud:
+`/hello`retorna un mensaje como el mostrado en el ejemplo dado en el enunciado:
 
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/a751ecff-e540-40b4-9fa7-fe0ea877e2f0)
-
-`/users` interpreta los parámetros de la consulta del URI para mostrar un mensaje personalizado.
-
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/ec3df66f-5fe8-4912-95b6-cad027643909)
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/2309dabe-cfea-4dc4-bd77-4b817235a01f)
 
 `/movies` realiza una solicitud a una API de películas utilizando el título proporcionado en los parámetros de la consulta del URI y devuelve la respuesta en formato JSON.
 
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/2f20b64b-a200-4c41-89a9-1d253abbeb48)
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/10baec65-37f5-4dc5-aea7-e298b715dad2)
 
 Este mismo servicio puede ser usado por clientes web para dar un mejor formato a la salida de la consulta:
 
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/7f6c0f71-4ef5-4b40-9187-f8f66c70a7cd)
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/d78bff31-f5ee-4672-b6b1-3196870c9c2d)
+
+`/products` muestra todos los productos registrado en el servicio.
+
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/382f5414-7c9a-4ade-a293-a47671d9e8ed)
+
+
 
 ### POST
 
-La clase `mySpark` ofrece el servicio post. Se desarrolló el siguiente ejemplo:
-
 Se implementó un servicio sencillo para enviar al servidor solicitudes POST para la creación de productos:
 
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/9ab564be-a570-4e01-b5e1-fe929bb34edc)
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/08876ab5-88ae-43bc-8118-c2b5a7f539aa)
 
-El servidor retorna el JSON del producto creado:
 
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/ab48e395-bd5b-4d37-8a7f-0c514f837090)
-
+El servidor retorna el JSON del producto creado.
 Podemos acceder a todos los productos al acceder al servicio get con ruta `/products`
 
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/733adf12-e5fb-467d-9fc5-5f3dfaed6dc9)
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/98c3c489-eb46-4177-b1d4-ea683a46bce4)
 
+Si se quiere acceder a un producto en específico se implementó un método que hace uso de la anotación `@PathVariable`:
 
-La demostración anterior se ejecutó sobre el sistema operativo Windows, a continuación, se ejecutará el servidor web en una máquina virtual con sistema operativo Kali Linux:
-
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/7b37a773-c45b-4226-b278-83108f7bcaf3)
-
-Realizamos solicitudes para comprobar el correcto funcionamiento.
-
-Archivos estáticos:
-
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/57bcd77a-e091-4e2f-b472-1dc55bded3aa)
-
-Servicio GET:
-
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/f26f1624-ce4e-48b7-b2be-baaa95e70529)
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/3e543062-3b27-423f-b182-5fd84ef57090)
 
 
 ## Ejecutando las Pruebas.  
