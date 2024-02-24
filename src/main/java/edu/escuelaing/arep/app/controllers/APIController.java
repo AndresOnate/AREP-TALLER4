@@ -1,4 +1,6 @@
-package edu.escuelaing.arep.app.controller;
+package edu.escuelaing.arep.app.controllers;
+
+import edu.escuelaing.arep.app.model.MovieAPI;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,10 +1,9 @@
-package edu.escuelaing.arep.app.service;
+package edu.escuelaing.arep.app.services;
 
 import edu.escuelaing.arep.app.model.Request;
 import edu.escuelaing.arep.app.model.ResponseBuilder;
 
 import java.io.IOException;
-import java.net.URI;
 
 public interface Function {
 

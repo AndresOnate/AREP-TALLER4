@@ -1,15 +1,12 @@
 package edu.escuelaing.arep.app;
 
 
-import edu.escuelaing.arep.app.annotations.Component;
-import edu.escuelaing.arep.app.annotations.GetMapping;
-import edu.escuelaing.arep.app.annotations.PostMapping;
-import edu.escuelaing.arep.app.annotations.RequestBody;
-import edu.escuelaing.arep.app.controller.APIController;
-import edu.escuelaing.arep.app.controller.MovieAPI;
+import edu.escuelaing.arep.app.annotations.*;
+import edu.escuelaing.arep.app.controllers.APIController;
+import edu.escuelaing.arep.app.model.MovieAPI;
 import edu.escuelaing.arep.app.model.Request;
 import edu.escuelaing.arep.app.model.ResponseBuilder;
-import edu.escuelaing.arep.app.service.Function;
+import edu.escuelaing.arep.app.services.Function;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -19,10 +16,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The `HttpServer` class represents a simple HTTP server that listens on port 35000 and handles incoming HTTP requests.
@@ -41,11 +35,11 @@ public class HTTPServer
 
     private static HashMap<String, Method> getServices = new HashMap<String, Method>();
     private static HashMap<String, Method> postServices = new HashMap<String, Method>();
+    private static HashMap<String, Function> mySparkGetServices = new HashMap<String, Function>();
+    private static HashMap<String, Function> mySparkPostServices = new HashMap<String, Function>();
 
-    private static HashMap<String, Function> mySparkServices = new HashMap<String, Function>();
 
-
-    private static String classesPath = "target/classes/edu/escuelaing/arep/app/controller/";
+    private static String classesPath = "target/classes/edu/escuelaing/arep/app/controllers/";
 
     private HTTPServer(){}
 
@@ -69,6 +63,7 @@ public class HTTPServer
                 loadComponent(classInPath);
             }
         }
+        System.out.println(getServices.keySet());
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(35000);
@@ -139,6 +134,7 @@ public class HTTPServer
         request.setUri(requestURI);
         outputLine =  ResponseBuilder.httpError(requestURI);
         String path = requestURI.getPath();
+
         try {
             if(requestURI.getPath().contains(".")){
                 if(uriStr.contains("png") || uriStr.contains("jpg") || uriStr.contains("ico")){
@@ -147,18 +143,26 @@ public class HTTPServer
                     outputLine = httpResponseFile(requestURI);
                 }
 
-            }else if (uriStr.startsWith("/action")){
-                String uriSpark = path.replace("/action", "");
-                if(mySparkServices.containsKey(uriSpark)){
-                    outputLine = callService(mySparkServices.get(uriSpark), request);
-                }
-            }
-            else if(httpMethod.equals("GET")){
-                if(getServices.containsKey(path)){
-                    outputLine = handleGETRequest(path);
+            }else if(httpMethod.equals("GET")){
+                if (uriStr.startsWith("/myspark") && mySparkGetServices.containsKey(path.replace("/myspark", ""))) {
+                    String uriSpark = path.replace("/myspark", "");
+                    outputLine = callService(mySparkGetServices.get(uriSpark), request);
+                } else{
+                    System.out.println("====Spring===");
+                    if(path.split("/").length > 2){
+                        int index = path.indexOf("/", 1);
+                        path = path.substring(0,index+1);
+                    }
+                    if(getServices.containsKey(path)){
+                        System.out.println(path);
+                        outputLine = handleGETRequest(path, requestURI);
+                    }
                 }
             } else if(httpMethod.equals("POST")) {
-                if (postServices.containsKey(path)) {
+                if (uriStr.startsWith("/myspark") && mySparkPostServices.containsKey(path.replace("/myspark", ""))) {
+                    String uriSpark = path.replace("/myspark", "");
+                    outputLine = callService(mySparkPostServices.get(uriSpark), request);
+                } else if (postServices.containsKey(path)) {
                     outputLine = handlePOSTRequest(path, requestBody);
                 }
             }
@@ -172,14 +176,29 @@ public class HTTPServer
         clientSocket.close();
     }
 
-    private static String handleGETRequest(String path) {
-        String outputLine = "";
+    private static String handleGETRequest(String path, URI requestURI) {
+        String outputLine =  "";
         Method webService = getServices.get(path);
         String contentType = webService.getAnnotation(GetMapping.class).produces();
         outputLine = ResponseBuilder.httpOkServiceCall("GET", contentType);
+        Parameter[] parameters = webService.getParameters();
         try {
-            outputLine += webService.invoke(null);
+            if(parameters.length != 0) {
+                String query = "";
+                if(parameters[0].isAnnotationPresent(PathVariable.class)){
+                    System.out.println("PathVariable");
+                    query = requestURI.getPath().split("/")[2];
+                }else if(parameters[0].isAnnotationPresent(RequestParam.class)) {
+                    System.out.println("RequestParam");
+                    query = requestURI.getQuery().split("=")[1];
+                }
+                System.out.println("Query:" + query);
+                outputLine += webService.invoke(null, query);
+            }else {
+                outputLine += webService.invoke(null);
+            }
         } catch (Exception e) {
+            outputLine = ResponseBuilder.httpError(requestURI);
             e.printStackTrace();
         }
         return outputLine;
@@ -289,7 +308,7 @@ public class HTTPServer
         for (String file : files) {
             if (file.endsWith(".class")) {
                 String className = file.substring(0, file.length() - 6);
-                className = "edu.escuelaing.arep.app.controller." + className;
+                className = "edu.escuelaing.arep.app.controllers." + className;
                 Class<?> classInPath = loadClass(className, directory);
                 if (classInPath != null) {
                     classes.add(classInPath);
@@ -325,11 +344,11 @@ public class HTTPServer
     }
 
     public static void  get(String path, Function svc) throws Exception {
-        mySparkServices.put(path,svc);
+        mySparkGetServices.put(path,svc);
     }
 
     public static void  post(String path, Function svc) throws Exception {
-        mySparkServices.put(path,svc);
+        mySparkPostServices.put(path,svc);
     }
 
 }

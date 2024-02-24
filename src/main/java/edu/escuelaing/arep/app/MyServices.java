@@ -1,9 +1,8 @@
 package edu.escuelaing.arep.app;
 
-import edu.escuelaing.arep.app.controller.APIController;
+import edu.escuelaing.arep.app.controllers.APIController;
 import edu.escuelaing.arep.app.model.Product;
-import edu.escuelaing.arep.app.model.ResponseBuilder;
-import edu.escuelaing.arep.app.service.ProductService;
+import edu.escuelaing.arep.app.services.ProductService;
 
 import java.net.URI;
 import java.util.Map;

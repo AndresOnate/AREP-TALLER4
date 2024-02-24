@@ -1,4 +1,4 @@
-package edu.escuelaing.arep.app.service;
+package edu.escuelaing.arep.app.services;
 
 import edu.escuelaing.arep.app.model.Product;
 

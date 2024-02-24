@@ -1,4 +1,4 @@
-package edu.escuelaing.arep.app.controller;
+package edu.escuelaing.arep.app.model;
 
 import java.io.IOException;
 

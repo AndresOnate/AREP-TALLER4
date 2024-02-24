@@ -1,7 +1,7 @@
 package edu.escuelaing.arep.app;
 
 
-import edu.escuelaing.arep.app.controller.APIController;
+import edu.escuelaing.arep.app.controllers.APIController;
 import org.junit.Test;
 
 import java.io.IOException;
