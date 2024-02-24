@@ -8,12 +8,12 @@ La aplicación está diseñada para cumplir con los requisitos especificados en 
 
 Se definieron las siguientes anotaciones:
 
-- `Component`:  Se utiliza para marcar las clases como componentes que ofrecen servicios web.
-- `GetMapping`: Esta anotación se usa para mapear métodos a solicitudes HTTP GET. Cuando se aplica `@GetMapping` a un método dentro de un componente, se especifica la ruta o la URL relativa a la cual ese método manejará las solicitudes GET.
-- `PostMapping`: Esta anotación se usa para mapear métodos a solicitudes HTTP POST. Cuando se aplica `@PostMapping` a un método dentro de un componente, se especifica la ruta o la URL relativa a la cual ese método manejará las solicitudes POST.
-- `PathVariable`: Esta anotación se utiliza para mapear variables de la URL de una solicitud a parámetros en un método controlador.
-- `RequestParam`: Esta anotación se utiliza para vincular parámetros de solicitud HTTP a parámetros de método en controladores.
-- `RequestBody`: Esta anotación se utiliza para vincular un parámetro al cuerpo de la solicitud HTTP.
+- `@Component`:  Se utiliza para marcar las clases como componentes que ofrecen servicios web.
+- `@GetMapping`: Esta anotación se usa para mapear métodos a solicitudes HTTP GET. Cuando se aplica `@GetMapping` a un método dentro de un componente, se especifica la ruta o la URL relativa a la cual ese método manejará las solicitudes GET.
+- `@PostMapping`: Esta anotación se usa para mapear métodos a solicitudes HTTP POST. Cuando se aplica `@PostMapping` a un método dentro de un componente, se especifica la ruta o la URL relativa a la cual ese método manejará las solicitudes POST.
+- `@PathVariable`: Esta anotación se utiliza para mapear variables de la URL de una solicitud a parámetros en un método controlador.
+- `@RequestParam`: Esta anotación se utiliza para vincular parámetros de solicitud HTTP a parámetros de método en controladores.
+- `@RequestBody`: Esta anotación se utiliza para vincular un parámetro al cuerpo de la solicitud HTTP.
 
 Se implementaron las siguientes clases:
 
