@@ -1,13 +1,9 @@
 package edu.escuelaing.arep.app.controller;
 
+import edu.escuelaing.arep.app.annotations.*;
 import edu.escuelaing.arep.app.annotations.Component;
-import edu.escuelaing.arep.app.annotations.GetMapping;
-import edu.escuelaing.arep.app.annotations.PostMapping;
-import edu.escuelaing.arep.app.annotations.RequestBody;
 import edu.escuelaing.arep.app.model.Product;
 import edu.escuelaing.arep.app.service.ProductService;
-
-import java.awt.*;
 
 @Component
 public class ProductController {
@@ -26,6 +22,14 @@ public class ProductController {
         productService.addProduct(product);
         return product.toString();
     }
+
+
+    @GetMapping(value = "/products/{id}", produces = "application/json")
+    public static String getProductsById(@RequestParam String id){
+        return productService.getProductById(id).toString();
+    }
+
+
 
 
 

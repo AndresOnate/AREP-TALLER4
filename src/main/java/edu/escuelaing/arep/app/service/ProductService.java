@@ -22,4 +22,13 @@ public class ProductService {
         return productList;
     }
 
+    public Product getProductById(String id){
+        for(Product product: productList){
+            if(product.getId().equals(id)){
+                return product;
+            }
+        }
+        return null;
+    }
+
 }

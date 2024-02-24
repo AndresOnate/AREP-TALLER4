@@ -39,8 +39,11 @@ public class HTTPServer
     private static HTTPServer _instance = new HTTPServer();
     private static String location = "public";
 
-        private static HashMap<String, Method> getServices = new HashMap<String, Method>();
+    private static HashMap<String, Method> getServices = new HashMap<String, Method>();
     private static HashMap<String, Method> postServices = new HashMap<String, Method>();
+
+    private static HashMap<String, Function> mySparkServices = new HashMap<String, Function>();
+
 
     private static String classesPath = "target/classes/edu/escuelaing/arep/app/controller/";
 
@@ -66,8 +69,6 @@ public class HTTPServer
                 loadComponent(classInPath);
             }
         }
-        System.out.println(getServices.keySet());
-
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(35000);
@@ -99,15 +100,12 @@ public class HTTPServer
      */
     private static void handleClientRequest(Socket clientSocket) throws IOException, URISyntaxException {
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(
-                        clientSocket.getInputStream()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String inputLine, outputLine = null;
         String requestBody = "";
         boolean firstLine = true;
         String httpMethod = "";
         String uriStr = "";
-
         Request request = new Request();
         while ((inputLine = in.readLine()) != null) {
             if(firstLine){
@@ -115,7 +113,6 @@ public class HTTPServer
                 uriStr = inputLine.split(" ")[1];
                 firstLine = false;
             }
-
             if(httpMethod.equals("POST")){
                 int contentLength = 0;
                 while ((inputLine = in.readLine()) != null && !inputLine.isEmpty()) {
@@ -124,14 +121,12 @@ public class HTTPServer
                         System.out.println(contentLength);
                     }
                 }
-
                 if (contentLength > 0) {
                     char[] bodyBuffer = new char[contentLength];
                     in.read(bodyBuffer, 0, contentLength);
                     requestBody = new String(bodyBuffer);
                     request.setBody(requestBody);
                     request.setHTTPVerb("POST");
-
                 }
             }
             System.out.println("Received: " + inputLine);
@@ -144,7 +139,6 @@ public class HTTPServer
         request.setUri(requestURI);
         outputLine =  ResponseBuilder.httpError(requestURI);
         String path = requestURI.getPath();
-
         try {
             if(requestURI.getPath().contains(".")){
                 if(uriStr.contains("png") || uriStr.contains("jpg") || uriStr.contains("ico")){
@@ -152,22 +146,20 @@ public class HTTPServer
                 }else{
                     outputLine = httpResponseFile(requestURI);
                 }
-            }else if(httpMethod.equals("GET")){
+
+            }else if (uriStr.startsWith("/action")){
+                String uriSpark = path.replace("/action", "");
+                if(mySparkServices.containsKey(uriSpark)){
+                    outputLine = callService(mySparkServices.get(uriSpark), request);
+                }
+            }
+            else if(httpMethod.equals("GET")){
                 if(getServices.containsKey(path)){
-                    Method webService = getServices.get(path);
-                    String contentType= webService.getAnnotation(GetMapping.class).produces();
-                    outputLine = ResponseBuilder.httpOkServiceCall("GET", contentType);
-                    outputLine = outputLine + webService.invoke(null);
+                    outputLine = handleGETRequest(path);
                 }
             } else if(httpMethod.equals("POST")) {
                 if (postServices.containsKey(path)) {
-                    Method webService = postServices.get(path);
-                    Parameter[] parameters = webService.getParameters();
-                    String contentType= webService.getAnnotation(PostMapping.class).produces();
-                    outputLine = ResponseBuilder.httpOkServiceCall("POST", contentType);
-                    if(parameters[0].isAnnotationPresent(RequestBody.class)){
-                        outputLine = outputLine + webService.invoke(null, requestBody);
-                    }
+                    outputLine = handlePOSTRequest(path, requestBody);
                 }
             }
         }catch (Exception e){
@@ -178,6 +170,35 @@ public class HTTPServer
         out.close();
         in.close();
         clientSocket.close();
+    }
+
+    private static String handleGETRequest(String path) {
+        String outputLine = "";
+        Method webService = getServices.get(path);
+        String contentType = webService.getAnnotation(GetMapping.class).produces();
+        outputLine = ResponseBuilder.httpOkServiceCall("GET", contentType);
+        try {
+            outputLine += webService.invoke(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return outputLine;
+    }
+
+    private static String handlePOSTRequest(String path, String requestBody) {
+        String outputLine = "";
+        Method webService = postServices.get(path);
+        Parameter[] parameters = webService.getParameters();
+        String contentType = webService.getAnnotation(PostMapping.class).produces();
+        outputLine = ResponseBuilder.httpOkServiceCall("POST", contentType);
+        if (parameters[0].isAnnotationPresent(RequestBody.class)) {
+            try {
+                outputLine += webService.invoke(null, requestBody);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return outputLine;
     }
 
     /**
@@ -235,7 +256,7 @@ public class HTTPServer
         location = newLocation;
     }
 
-    private String callService(Function service, Request request) throws IOException {
+    private static String callService(Function service, Request request) throws IOException {
         String output = "";
         try {
             output = service.handle(request, new ResponseBuilder());
@@ -269,7 +290,6 @@ public class HTTPServer
             if (file.endsWith(".class")) {
                 String className = file.substring(0, file.length() - 6);
                 className = "edu.escuelaing.arep.app.controller." + className;
-                System.out.println(className);
                 Class<?> classInPath = loadClass(className, directory);
                 if (classInPath != null) {
                     classes.add(classInPath);
@@ -302,6 +322,14 @@ public class HTTPServer
                 postServices.put(service, method);
             }
         }
+    }
+
+    public static void  get(String path, Function svc) throws Exception {
+        mySparkServices.put(path,svc);
+    }
+
+    public static void  post(String path, Function svc) throws Exception {
+        mySparkServices.put(path,svc);
     }
 
 }
