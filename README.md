@@ -1,4 +1,4 @@
-# ARQUITECTURAS DE SERVIDORES DE APLICACIONES, META PROTOCOLOS DE OBJETOS, PATRÓN IOC, REFLEXIÓN
+# TALLER DE ARQUITECTURAS DE SERVIDORES DE APLICACIONES, META PROTOCOLOS DE OBJETOS, PATRÓN IOC, REFLEXIÓN
 
 En este taller se construyó un servidor web  tipo apache para soportar una funcionalidad similar a la de Spring. El servidor debe provee un framework IoC para la construcción de aplicaciones web a partir de POJOS.
 
@@ -6,14 +6,26 @@ En este taller se construyó un servidor web  tipo apache para soportar una func
 
 La aplicación está diseñada para cumplir con los requisitos especificados en el enunciado del taller y proporcionar una experiencia de usuario fluida y satisfactoria. A continuación, se describen los principales componentes y características de la aplicación:
 
-- La clase `MySpark` permite el registro de servicios get y post usando funciones lambda, es responsable de manejar las solicitudes entrantes de los usuarios y coordinar las interacciones entre el cliente. Además, incluye métodos para configurar el directorio de los archivos estáticos y el tipo de respuesta del servicio, lo que permite servir contenido estático como archivos `HTML`, `CSS`, `JavaScript` e imágenes en los formatos `PNG` y `JPG`.
+Se definieron las siguientes anotaciones:
+
+- `@Component`:  Se utiliza para marcar las clases como componentes que ofrecen servicios web.
+- `@GetMapping`: Esta anotación se usa para mapear métodos a solicitudes HTTP GET. Cuando se aplica `@GetMapping` a un método dentro de un componente, se especifica la ruta o la URL relativa a la cual ese método manejará las solicitudes GET.
+- `@PostMapping`: Esta anotación se usa para mapear métodos a solicitudes HTTP POST. Cuando se aplica `@PostMapping` a un método dentro de un componente, se especifica la ruta o la URL relativa a la cual ese método manejará las solicitudes POST.
+- `@PathVariable`: Esta anotación se utiliza para mapear variables de la URL de una solicitud a parámetros en un método controlador.
+- `@RequestParam`: Esta anotación se utiliza para vincular parámetros de solicitud HTTP a parámetros de método en controladores.
+- `@RequestBody`: Esta anotación se utiliza para vincular un parámetro al cuerpo de la solicitud HTTP.
+
+Se implementaron las siguientes clases:
+
+- La clase `HTTPServer` consulta de forma recursiva  el directorio raíz  buscando clases con la anotación `@Component`, si la clase contiene la anotación, busca métodos con las anotaciones `@GetMapping` y `@PostMapping` para poder procesar las solicitudes asociadas a cada método. Esta clase también ofrece métodos para procesar las solicitudes de servicios estáticos como archivos `HTML` y `PNG` .
+- La clase `HTTPServer` aún permite el registro de servicios get y post usando funciones lambda, como lo fue implementado en el taller anterior, es responsable de manejar las solicitudes entrantes de los usuarios y coordinar las interacciones entre el cliente. Además, incluye métodos para configurar el directorio de los archivos estáticos y el tipo de respuesta del servicio, lo que permite servir contenido estático como archivos HTML, CSS, JavaScript e imágenes en los formatos PNG y JPG.
 - La interfaz `Function` define un único método `handle`, que toma un objeto de tipo `Request` y `ResponseBuilder` para devolver una cadena de caracteres. Esta interfaz se utiliza en la clase `MySpark` para definir las funciones lambda que manejan las solicitudes entrantes de los usuarios. El método handle es responsable de procesar la solicitud y generar una respuesta adecuada.
 - La clase `Request` representa una solicitud HTTP entrante y proporciona métodos para acceder a sus atributos, como la URI y el cuerpo de la solicitud. 
 - La clase `APIController` realiza la conexión a OMDb API en el método `connectToMoviesAPI`, al cual se le pasa como argumento el título de la película. Si la película es encontrada, se retorna un String con los datos, de lo contrario, se establecen mecanismos para validar si la película no fue encontrada y mostrar al usuario el estado de la consulta. Utiliza una estructura de datos concurrente `ConcurrentHashMap` para almacenar en caché las consultas realizadas a la API. Esto mejora significativamente los tiempos de respuesta al evitar consultas repetidas para las mismas películas. 
 - La clase `ResponseBuilder` ofrece métodos para construir las respuestas HTML que son enviadas a los usuarios. Proporciona métodos para generar respuestas HTTP con diferentes códigos de estado y tipos de contenido.
 - Se agrega el directorio `resources` donde se almacenan los archivos que serán leídos por el servidor.
 - Las clases `Product` y `ProductService`son agregadas para mostrar el comportamiento del servicio post.
-- La clase `MyServices` contiene ejemplos que muestran cómo se desarrollarían las aplicaciones en su servidor.
+- La clase `MyServices` contiene ejemplos que muestran cómo se desarrollarían las aplicaciones en mySpark en su servidor.
 
 ## Guía de Inicio
 
