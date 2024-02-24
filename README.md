@@ -1,6 +1,6 @@
 # ARQUITECTURAS DE SERVIDORES DE APLICACIONES, META PROTOCOLOS DE OBJETOS, PATRÓN IOC, REFLEXIÓN
 
-En este taller se construyó un servidor web para soportar una funcionalidad similar a la de SparkJava, un microframework WEB que permite construir aplicaciones web de manera simple usando funciones lambda.
+En este taller se construyó un servidor web  tipo apache para soportar una funcionalidad similar a la de Spring. El servidor debe provee un framework IoC para la construcción de aplicaciones web a partir de POJOS.
 
 ## Diseño de la aplicación
 
