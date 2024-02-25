@@ -190,7 +190,6 @@ A continuación se muestra cómo ejecutar las pruebas desde la línea de comando
 - Maven - Administrador de dependencias
 
 ## Versión
-
 1.0.0
 
 ## Autores
