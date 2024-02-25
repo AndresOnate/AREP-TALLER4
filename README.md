@@ -179,14 +179,11 @@ A continuación se muestra cómo ejecutar las pruebas desde la línea de comando
    ``` mvn test ```
 3. Debe mostrarse en pantalla que las pruebas fueron exitosas.
 
-   ![image](https://github.com/AndresOnate/AREP-TALLER2/assets/63562181/a14eef59-15ba-4f74-a8ea-c0749929d6d0)
-
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/4c39b8e5-5738-43d7-acf7-5f8bc9f09bea)
 
 4. Puede ejecutar las pruebas desde un IDE como IntelliJ:
 
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/3f85f85b-4909-46ea-82c9-2a7da900650e)
-
-
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/7d9aa6e5-4033-4b4b-b185-32eb20aee33d)
 
 ## Construido Con. 
 
