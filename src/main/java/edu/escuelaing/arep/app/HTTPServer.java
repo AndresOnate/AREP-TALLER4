@@ -39,7 +39,7 @@ public class HTTPServer
     private static HashMap<String, Function> mySparkPostServices = new HashMap<String, Function>();
 
 
-    private static String classesPath = "target/classes/edu/escuelaing/arep/app/controllers/";
+    private static String classesPath = "target\\classes\\edu\\escuelaing\\arep\\app\\";
 
     private HTTPServer(){}
 
@@ -63,6 +63,7 @@ public class HTTPServer
                 loadComponent(classInPath);
             }
         }
+        System.out.println(classes);
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(35000);
@@ -92,7 +93,7 @@ public class HTTPServer
      * @throws IOException If an I/O error occurs while reading from or writing to the client socket.
      * @throws URISyntaxException If an error occurs while parsing the URI of the request.
      */
-    private static void handleClientRequest(Socket clientSocket) throws IOException, URISyntaxException {
+    public static void handleClientRequest(Socket clientSocket) throws IOException, URISyntaxException {
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String inputLine, outputLine = null;
@@ -303,14 +304,18 @@ public class HTTPServer
     public static List<Class<?>> getClasses(String directory) throws IOException, ClassNotFoundException {
         List<Class<?>> classes = new ArrayList<>();
         File folder = new File(directory);
-        String[] files = folder.list();
-        for (String file : files) {
-            if (file.endsWith(".class")) {
-                String className = file.substring(0, file.length() - 6);
-                className = "edu.escuelaing.arep.app.controllers." + className;
-                Class<?> classInPath = loadClass(className, directory);
-                if (classInPath != null) {
-                    classes.add(classInPath);
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    classes.addAll(getClasses(file.getPath() + '\\'));
+                } else if (file.getName().endsWith(".class")) {
+                    String className = file.getName().substring(0, file.getName().length() - 6);
+                    className = directory.substring(directory.indexOf("classes") + 8).replace(File.separator, ".")  + className;
+                    Class<?> classInPath = loadClass(className, directory);
+                    if (classInPath != null && classInPath.isAnnotationPresent(Component.class)) {
+                        classes.add(classInPath);
+                    }
                 }
             }
         }

@@ -4,28 +4,26 @@ package edu.escuelaing.arep.app;
 import edu.escuelaing.arep.app.controllers.APIController;
 import org.junit.Test;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.Socket;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 public class HTTPServerTest {
 
-
     @Test
-    public void testGetMovieInformationValidTitle() throws IOException {
-        String uriStr = "/movies?title=Inception";
-        APIController movieAPI = new APIController();
-        String result = movieAPI.connectToMoviesAPI("Inception");
-        assertTrue(result.contains("Inception"));
-        assertTrue(result.contains("2010"));
-        assertTrue(result.contains("Sci-Fi"));
+    public void testGetClasses() throws IOException, ClassNotFoundException {
+        String directory = "target/classes/edu/escuelaing/arep/app/controllers/";
+        List<Class<?>> classes = HTTPServer.getClasses(directory);
+        assertFalse(classes.isEmpty());
     }
 
     @Test
-    public void testGetMovieInformationInvalidTitle() throws IOException {
-        String uriStr = "/movies?title=NonExistentMovie";
-        APIController movieAPI = new APIController();
-        String result = movieAPI.connectToMoviesAPI("NonExistentMovie");
-        System.out.println(result);
-        assertTrue(result.contains("{\"Response\":\"False\",\"Error\":\"Movie not found!\"}"));
+    public void testLoadClass() throws ClassNotFoundException {
+        String className = "edu.escuelaing.arep.app.controllers.APIController";
+        String directory = "target/classes/edu/escuelaing/arep/app/controllers/";
+        Class<?> loadedClass = HTTPServer.loadClass(className, directory);
+        assertNotNull(loadedClass);
     }
+
 }

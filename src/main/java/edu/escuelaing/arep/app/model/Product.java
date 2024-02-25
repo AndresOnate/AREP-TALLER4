@@ -22,6 +22,9 @@ public class Product {
             String key = keyValue[0];
             String value = keyValue[1];
             switch (key) {
+                case "id":
+                    this.id = value;
+                    break;
                 case "name":
                     this.name = value;
                     break;
@@ -69,7 +72,4 @@ public class Product {
                 + "\"price\": " + price
                 + "}";
     }
-
-
-
 }

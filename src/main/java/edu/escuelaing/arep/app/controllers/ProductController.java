@@ -27,10 +27,4 @@ public class ProductController {
     public static String getProductsById(@PathVariable String id){
         return productService.getProductById(id).toString();
     }
-
-
-
-
-
-
 }

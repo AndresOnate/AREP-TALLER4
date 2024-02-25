@@ -1,4 +1,4 @@
-package edu.escuelaing.arep.app.controllers;
+package edu.escuelaing.arep.app;
 
 import edu.escuelaing.arep.app.annotations.Component;
 import edu.escuelaing.arep.app.annotations.GetMapping;
