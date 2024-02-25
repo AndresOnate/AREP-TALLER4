@@ -164,7 +164,7 @@ Podemos acceder a todos los productos al acceder al servicio get con ruta `/prod
 
 ![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/98c3c489-eb46-4177-b1d4-ea683a46bce4)
 
-Si se quiere acceder a un producto en específico se implementó un método que hace uso de la anotación `@PathVariable`:
+Si se quiere acceder a un producto en específico, se implementó un método que hace uso de la anotación `@PathVariable`:
 
 ![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/3e543062-3b27-423f-b182-5fd84ef57090)
 
