@@ -13,7 +13,7 @@ public class HTTPServerTest {
 
     @Test
     public void testGetClasses() throws IOException, ClassNotFoundException {
-        String directory = "target/classes/edu/escuelaing/arep/app/controllers/";
+        String directory = "target\\classes\\edu\\escuelaing\\arep\\app\\";
         List<Class<?>> classes = HTTPServer.getClasses(directory);
         assertFalse(classes.isEmpty());
     }
