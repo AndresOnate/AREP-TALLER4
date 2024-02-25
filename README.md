@@ -76,9 +76,9 @@ Las anotaciones  `GetMapping` y  `PostMapping` registran el valor con el cual el
 
 - `PostMapping`: La anotación @PostMapping se utiliza para mapear métodos de controlador a solicitudes HTTP POST. Al igual que @GetMapping, se aplica sobre métodos de controlador y se especifica la ruta relativa del endpoint que manejará. Por ejemplo, al aplicar @PostMapping("/products") a un método saveProduct(String newProduct), este método manejará las solicitudes POST a la URL "/products".
   
-- `PathVariable`: En algunos casos, es necesario capturar variables de la URL dentro de los métodos del controlador. El valor de la variable de ruta se extraería de la URL y se pasaría al método como argumento. Por ahora, solo está implementado para una variable.
+- `PathVariable`: En algunos casos, es necesario capturar variables de la URL dentro de los métodos del controlador. El valor de la variable de ruta se extraería de la URL y se pasaría al método como argumento. En esta versión, solo está implementado para una variable.
 
-- `PathVariable`: Se utiliza para extraer los parámetros de una solicitud HTTP. Por ejemplo, una solicitud GET a "/movies?title=TheMatrix" proporcionaría "TheMatrix" como valor para el parámetro "title"
+- `PathVariable`: Se utiliza para extraer los parámetros de una solicitud HTTP. En esta versión, solo está implementado para un parámetro.
 
 Ejemplo de un servicio GET:
 
@@ -99,7 +99,8 @@ En este ejemplo, se tiene un método de controlador que maneja las solicitudes H
 ```
 Este método maneja las solicitudes GET dirigidas a la ruta `/products/` seguida de un identificador único de producto, como por ejemplo `/products/1`. Captura este identificador único de producto de la URL como un parámetro de ruta utilizando la anotación `@PathVariable`.
 
-Ejemplo de una función lambda en un servicio POST:
+Ejemplo de un servicio POST:
+
 ```
     @PostMapping(value = "/products", produces = "application/json")
     public static String saveProduct(@RequestBody String newProduct){
@@ -107,10 +108,9 @@ Ejemplo de una función lambda en un servicio POST:
         productService.addProduct(product);
         return product.toString();
     }
-
 ```
 
-Este método maneja las solicitudes POST dirigidas a la ruta "/products". Cuando se recibe una solicitud, espera que el cuerpo de la misma contenga información sobre un nuevo producto en formato JSON. Utilizando esta información, crea un nuevo objeto de tipo Product y lo añade a la base de datos mediante el servicio productService. Posteriormente, devuelve los detalles del producto recién creado en formato JSON como respuesta al cliente.
+Este método maneja las solicitudes POST dirigidas a la ruta "/products". Cuando se recibe una solicitud, espera que el cuerpo de la misma contenga información sobre un nuevo producto en formato JSON. Utilizando esta información, crea un nuevo objeto de tipo Product. Posteriormente, devuelve los detalles del producto recién creado.
 
 Por defecto, los servicios estarán disponibles en la ruta `http://localhost:35000/`
 
@@ -164,7 +164,7 @@ Podemos acceder a todos los productos al acceder al servicio get con ruta `/prod
 
 ![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/98c3c489-eb46-4177-b1d4-ea683a46bce4)
 
-Si se quiere acceder a un producto en específico se implementó un método que hace uso de la anotación `@PathVariable`:
+Si se quiere acceder a un producto en específico, se implementó un método que hace uso de la anotación `@PathVariable`:
 
 ![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/3e543062-3b27-423f-b182-5fd84ef57090)
 
@@ -179,14 +179,11 @@ A continuación se muestra cómo ejecutar las pruebas desde la línea de comando
    ``` mvn test ```
 3. Debe mostrarse en pantalla que las pruebas fueron exitosas.
 
-   ![image](https://github.com/AndresOnate/AREP-TALLER2/assets/63562181/a14eef59-15ba-4f74-a8ea-c0749929d6d0)
-
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/4c39b8e5-5738-43d7-acf7-5f8bc9f09bea)
 
 4. Puede ejecutar las pruebas desde un IDE como IntelliJ:
 
-![image](https://github.com/AndresOnate/AREP-TALLER3/assets/63562181/3f85f85b-4909-46ea-82c9-2a7da900650e)
-
-
+![image](https://github.com/AndresOnate/AREP-TALLER4/assets/63562181/7d9aa6e5-4033-4b4b-b185-32eb20aee33d)
 
 ## Construido Con. 
 
