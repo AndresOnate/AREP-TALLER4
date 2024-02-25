@@ -73,7 +73,12 @@ public class ResponseBuilder {
         return output;
     }
 
-
+    /**
+     * Constructs an HTTP response string with the specified HTTP verb and content type for a successful service call.
+     * @param verb The HTTP verb used for the service call
+     * @param contentType The content type of the response
+     * @return The HTTP response string.
+     */
     public static String httpOkServiceCall(String verb, String contentType){
         String returnCode = "200 OK";
         if(verb.equals("POST")){
@@ -85,6 +90,12 @@ public class ResponseBuilder {
         return output;
     }
 
+
+    /**
+     * Constructs an HTTP response header with a 200 OK status code.
+     * @param contentType The content type to be included in the response header.
+     * @return The HTTP response header with the 200 OK status code and the specified content type.
+     */
     public static String httpOkHeader(String contentType){
         return   "HTTP/1.1 200 OK\r\n"
                 + "Content-Type:" + contentType
@@ -127,6 +138,10 @@ public class ResponseBuilder {
         return outputLine;
     }
 
+    /**
+     * Sets the response type to the specified value.
+     * @param newType The new response type to be set.
+     */
     public void setResponseType(String newType){
         responseType = newType;
     }
